@@ -4,7 +4,7 @@ import java.lang.reflect.InvocationTargetException;
 public class RunClient {
     public static void main(String args[]) {//throws ChatException, InterruptedException, InvocationTargetException {
 
-        Client client=new Client();
+        ChatClientGUI gui=new ChatClientGUI();
 
 //        class GUIGenerator implements Runnable {
 //            private ChatClientGUI gui;

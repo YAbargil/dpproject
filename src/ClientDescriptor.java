@@ -4,6 +4,7 @@ public class ClientDescriptor implements StringConsumer, StringProducer{
     private String name;
 
     public ClientDescriptor(){
+        this.name="";
 
     }
 
@@ -11,8 +12,14 @@ public class ClientDescriptor implements StringConsumer, StringProducer{
 
     @Override
     public void consume(String text) throws ChatException {
+        if(name.isEmpty()){
+            this.name=text;
+            consumer.consume(text + " has joined the chat!\n");
+        }
+        else{
+            consumer.consume(name+":\n"+text+"\n");
+        }
         System.out.println("ClientDescriptor consumed = "+text);
-        consumer.consume(text);
     }
 
     @Override
