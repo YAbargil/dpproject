@@ -98,23 +98,6 @@ public class MessageBoard implements StringConsumer, StringProducer {
             removeConsumer(consumerToRemove);
             ((ConnectionProxy)consumerToRemove).stop();
         }
-//        else if(str.startsWith(Constants.privateMessage)){
-//            String nicknameDestination=str.substring(str.indexOf("_")+1,str.lastIndexOf("@"));
-//            System.out.println("PRIVATE MESSAGE TO "+nicknameDestination);
-//            ConnectionProxy proxyDest=null;
-//            for(StringConsumer sc:consumers){
-//                ConnectionProxy proxy=(ConnectionProxy)sc;
-//                if(((ConnectionProxy) sc).getNickname().equals(nicknameDestination)){
-//                    proxyDest=proxy;
-//                    break;
-//                }
-//            }
-//            if(proxyDest!=null){
-////                proxyDest.consume("(PRIVATE)"+ str.substring(str.lastIndexOf("@")+1)+"\n");
-//                proxyDest.consume(str);
-//            }
-//        }
-
         else if(str.startsWith(Constants.privateMessage)){
             System.out.println("INSIDE PRIVATE");
             String nicknameDestination=str.substring(str.indexOf("%")+1,str.lastIndexOf("@"));

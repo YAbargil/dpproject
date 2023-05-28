@@ -8,11 +8,11 @@ import java.util.Arrays;
 import java.util.Objects;
 
 public class ChatClientGUI implements StringConsumer, StringProducer {
-    ConnectionProxy proxy = null;
-    JTextArea textArea;
-     JComboBox comboBox;
+    private ConnectionProxy proxy = null;
+    private JTextArea textArea;
+     public JComboBox comboBox;
 
-    JScrollPane areaScrollPane;
+    private JScrollPane areaScrollPane;
     private StringConsumer consumer;
     private JFrame frame;
     private JLabel ipAddressField, portField, nameField;
@@ -185,6 +185,7 @@ public class ChatClientGUI implements StringConsumer, StringProducer {
             System.out.println("IN DELETING THE USER FROM COMBO BOX");
             String toDelete = text.substring((text.lastIndexOf("@") + 1));
             textArea.append(toDelete+ " has left the chat!\n");
+            if(((String)comboBox.getSelectedItem()).equals(toDelete)) comboBox.setSelectedIndex(0);
             for (int i = 0; i < comboBox.getItemCount(); i++) {
                 String item = (String) comboBox.getItemAt(i);
                 if (item.equals(toDelete)) {
@@ -261,7 +262,6 @@ public class ChatClientGUI implements StringConsumer, StringProducer {
 //            this.state(new ConnectedState());
 
             if (proxy != null) {
-                ChatClientGUI.this.consumer.consume(nicknameText.getText() + " has left the chat.");
                 ChatClientGUI.this.consumer.consume(Constants.deleteUser + nicknameText.getText());
                 proxy = null;
                 comboBox.removeAllItems();
@@ -271,7 +271,9 @@ public class ChatClientGUI implements StringConsumer, StringProducer {
             clearInputs();
 //            btConnect.setForeground(Color.RED);
             btConnect.setText("Connect");
-
+            ipText.setBackground(Color.white);
+            portText.setBackground(Color.white);
+            nicknameText.setBackground(Color.white);
             btConnect.setEnabled(true);
             btSend.setEnabled(false);
             messageText.setText("");

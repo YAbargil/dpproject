@@ -79,6 +79,8 @@ public class ConnectionProxy extends Thread implements StringConsumer, StringPro
 //                    this.consumer.consume(text);
                 }
                 if(text.startsWith(Constants.deleteUser) && this.nickname.equals(text.substring((text.lastIndexOf("@") + 1)))){
+                    this.consumer.consume(text);
+                    this.consumer=null;
 //                    this.stop();
                     return;
                 }
