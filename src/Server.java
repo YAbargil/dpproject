@@ -21,6 +21,7 @@ public class Server {
             client.addConsumer(mb);
             mb.addConsumer(connection);
             connection.start();
+            System.out.println("the connection proxy has started   thread="+Thread.currentThread().getName());
         }
 
     }
@@ -55,26 +56,3 @@ public class Server {
 //        System.out.println("the new thread that works on the ConnectionProxy object has started   thread="+Thread.currentThread().getName());
     }
 }
-//
-//class ServerConsumer implements StringConsumer, StringProducer {
-//
-//    private StringConsumer consumer;
-//
-//    @Override
-//    public void consume(String text) throws ChatException {
-//       System.out.println("text="+text);
-//        consumer.consume(text);
-//    }
-//
-//    @Override
-//    public void addConsumer(StringConsumer consumer) {
-//        this.consumer = consumer;
-//    }
-//
-//    @Override
-//    public void removeConsumer(StringConsumer consumer) {
-//        if(consumer==this.consumer) {
-//            this.consumer = null;
-//        }
-//    }
-//}

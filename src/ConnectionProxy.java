@@ -4,6 +4,7 @@ import java.util.List;
 
 public class ConnectionProxy extends Thread implements StringConsumer, StringProducer {
 
+    private String nickname="";
     private StringConsumer consumer;
     private Socket socket;
     private InputStream is;
@@ -31,13 +32,15 @@ public class ConnectionProxy extends Thread implements StringConsumer, StringPro
     }
 
     //client-side constructor
-    public ConnectionProxy(String computer, int port) throws ChatException {
+    //add name
+    public ConnectionProxy(String computer, int port,String nickname) throws ChatException {
         try {
             this.socket = new Socket(computer,port);
             is = socket.getInputStream();
             os = socket.getOutputStream();
             dis = new DataInputStream(is);
             dos = new DataOutputStream(os);
+            this.nickname=nickname;
         } catch(IOException e) {
             throw new ChatException(e.getMessage(),e);
         }
@@ -56,6 +59,10 @@ public class ConnectionProxy extends Thread implements StringConsumer, StringPro
     }
 
 
+    public String getNickname() {
+        return nickname;
+    }
+
     //invoked where start()
     //separated Thread, sleep until message received in readUTF()
     @Override
@@ -65,11 +72,27 @@ public class ConnectionProxy extends Thread implements StringConsumer, StringPro
             try {
                 System.out.println("about to call dis.readUTF  thread="+Thread.currentThread().getName());
                 String text = dis.readUTF();
-                System.out.println("dis.readUTF returned "+text+"     thread="+Thread.currentThread().getName());
-               this.consumer.consume(text);
-                System.out.println("calling consumer.consume() passing over "+text+ "    thread="+Thread.currentThread().getName());
+//                System.out.println("first reading the stream current name is "+ this.getNickname()+ this.getNickname().isEmpty());
+                if(this.nickname.isEmpty()) {
+                    System.out.println("nickname is empty");
+                    this.nickname=text;
+//                    this.consumer.consume(text);
+                }
+                if(text.startsWith(Constants.deleteUser) && this.nickname.equals(text.substring((text.lastIndexOf("@") + 1)))){
+//                    this.stop();
+                    return;
+                }
+                else{
+                    this.consumer.consume(text);
+                    System.out.println("calling consumer.consume() passing over "+text+ "    thread="+Thread.currentThread().getName());
+                }
+
+
+//                System.out.println("dis.readUTF returned "+text+"     thread="+Thread.currentThread().getName());
+
             } catch(IOException | ChatException e) {
                 try {
+                    System.out.println("ERROR WAS MADE!!");
                    this.consumer.consume("error");
               } catch(ChatException exception) {
                     exception.printStackTrace();
@@ -77,6 +100,9 @@ public class ConnectionProxy extends Thread implements StringConsumer, StringPro
             }
         }
     }
+
+
+
 
     @Override
     public void addConsumer(StringConsumer consumer) {
