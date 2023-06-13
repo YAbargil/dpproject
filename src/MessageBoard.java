@@ -47,7 +47,8 @@ public class MessageBoard implements StringConsumer, StringProducer {
         // new user connected
         if (str.startsWith(Constants.createUser)) {
             List<String> nicknames = new ArrayList<>();
-            String userNickname = str.substring((str.lastIndexOf("@") + 1));
+//            String userNickname = str.substring((str.lastIndexOf("@") + 1));
+            String userNickname = str.substring((Helpers.findNthAppearance(str,'@',2) + 1));
             ConnectionProxy proxy = null;
 
             Iterator<StringConsumer> iterator = consumers.iterator();
@@ -68,7 +69,9 @@ public class MessageBoard implements StringConsumer, StringProducer {
         }
 
         else if (str.startsWith(Constants.deleteUser)) {
-            String deleteNickname = str.substring((str.lastIndexOf("@") + 1));
+//            String deleteNickname = str.substring((str.lastIndexOf("@") + 1));
+            String deleteNickname = str.substring((Helpers.findNthAppearance(str,'@',2) + 1));
+
             StringConsumer consumerToRemove = null;
 
             Iterator<StringConsumer> iterator = consumers.iterator();
@@ -88,7 +91,9 @@ public class MessageBoard implements StringConsumer, StringProducer {
 
         else if (str.startsWith(Constants.privateMessage)) {
             System.out.println("INSIDE PRIVATE");
-            String nicknameDestination = str.substring(str.indexOf("%") + 1, str.lastIndexOf("@"));
+//            String nicknameDestination = str.substring(str.indexOf("%") + 1, str.lastIndexOf("@"));
+            String nicknameDestination = str.substring(str.indexOf("%") + 1, Helpers.findNthAppearance(str,'@',2));
+
             System.out.println("PRIVATE MESSAGE TO " + nicknameDestination);
             String nicknameSender = str.substring(str.indexOf("#") + 1, str.indexOf("&"));
             System.out.println("@@@@@PRIVATE MESSAGE FROM " + nicknameSender);

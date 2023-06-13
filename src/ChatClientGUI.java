@@ -166,7 +166,8 @@ public class ChatClientGUI implements StringConsumer, StringProducer {
         System.out.println("IN GUI WITH "+ text);
         if(text.startsWith(Constants.createComboBox)){
             textArea.append("Welcome to chat !\n");
-            String activeUsers=text.substring((text.lastIndexOf("@")+1));
+//            String activeUsers=text.substring((text.lastIndexOf("@")+1));
+            String activeUsers=text.substring((Helpers.findNthAppearance(text,'@',2)+1));
             String[] users=activeUsers.split("#");
             System.out.println("CREATE COMBO BOX WITH USERS "+ Arrays.toString(users));
             for(String user:users){
@@ -177,14 +178,17 @@ public class ChatClientGUI implements StringConsumer, StringProducer {
             }
         }
         else if(text.startsWith(Constants.updateComboBox)){
-            String newUser=text.substring((text.lastIndexOf("@")+1));
+            String newUser=text.substring((Helpers.findNthAppearance(text,'@',2)+1));
+//            String newUser=text.substring((text.lastIndexOf("@")+1));
             textArea.append(newUser +" has joined the chat!\n");
             System.out.println("UPDATE COMBO BOX WITH "+ newUser);
             comboBox.addItem(newUser);
         }
         else if(text.startsWith(Constants.deleteUser)) {
             System.out.println("IN DELETING THE USER FROM COMBO BOX");
-            String toDelete = text.substring((text.lastIndexOf("@") + 1));
+//            String toDelete = text.substring((text.lastIndexOf("@") + 1));
+            String toDelete = text.substring((Helpers.findNthAppearance(text,'@',2)+1));
+
             textArea.append(toDelete+ " has left the chat!\n");
             if(((String)comboBox.getSelectedItem()).equals(toDelete)) comboBox.setSelectedIndex(0);
             for (int i = 0; i < comboBox.getItemCount(); i++) {
@@ -198,13 +202,18 @@ public class ChatClientGUI implements StringConsumer, StringProducer {
 //        @PRIVATE_FROM#Harley&TO%Rocky@hello
         else if(text.startsWith(Constants.privateMessage)){
             System.out.println("WERE PRIVATE ! " + text);
-            String firstName=text.substring(text.indexOf("#")+1,text.lastIndexOf("&")).trim();
-            String secondName=text.substring(text.indexOf("%")+1,text.lastIndexOf("@")).trim();
+//            String firstName=text.substring(text.indexOf("#")+1,text.lastIndexOf("&")).trim();
+            String firstName=text.substring(text.indexOf("#")+1,text.indexOf("&")).trim();
+//            String secondName=text.substring(text.indexOf("%")+1,text.lastIndexOf("@")).trim();
+            String secondName=text.substring(text.indexOf("%")+1,Helpers.findNthAppearance(text,'@',2)).trim();
             if(firstName.equals(ChatClientGUI.this.nicknameText.getText().trim())){
-                textArea.append("(PRIVATE) to "+ secondName+":\n"+text.substring(text.lastIndexOf("@")+1)+"\n");
+//                textArea.append("(PRIVATE) to "+ secondName+":\n"+text.substring(text.lastIndexOf("@")+1)+"\n");
+                textArea.append("(PRIVATE) to "+ secondName+":\n"+text.substring(Helpers.findNthAppearance(text,'@',2)+1)+"\n");
+
             }
             else{
-                textArea.append("(PRIVATE) From "+ firstName+":\n"+text.substring(text.lastIndexOf("@")+1)+"\n");
+//                textArea.append("(PRIVATE) From "+ firstName+":\n"+text.substring(text.lastIndexOf("@")+1)+"\n");
+                textArea.append("(PRIVATE) From "+ firstName+":\n"+text.substring(Helpers.findNthAppearance(text,'@',2)+1)+"\n");
 
             }
         }
