@@ -7,6 +7,7 @@ import java.awt.event.ActionListener;
 import java.util.Arrays;
 import java.util.Objects;
 
+
 public class ChatClientGUI implements StringConsumer, StringProducer {
     private ConnectionProxy proxy = null;
     private JTextArea textArea;
@@ -90,9 +91,9 @@ public class ChatClientGUI implements StringConsumer, StringProducer {
             frame.add(panelSouth, BorderLayout.SOUTH);
             frame.setSize(800, 500);
             frame.setVisible(true);
-            btSend.addActionListener(new ButtonsObserver(this));
-            btConnect.addActionListener(new connectingButton());
-            btDisconnect.addActionListener(new disconnectingButton());
+            btSend.addActionListener(new ButtonListener(this));
+            btConnect.addActionListener(new ButtonListener(this));
+            btDisconnect.addActionListener(new ButtonListener(this));
         });
         guiThread.start();
     }
@@ -283,72 +284,152 @@ public class ChatClientGUI implements StringConsumer, StringProducer {
         }
     }
 
-    class disconnectingButton implements ActionListener {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            stateDisconnected();
-        }
-    }
+//    class disconnectingButton implements ActionListener {
+//        @Override
+//        public void actionPerformed(ActionEvent e) {
+//            stateDisconnected();
+//        }
+//    }
+//
+//    class connectingButton implements ActionListener {
+//        @Override
+//        public void actionPerformed(ActionEvent e) {
+//            String ip = ipText.getText();
+//            String port = portText.getText().replaceAll("[^0-9]", "");
+//            String nickname = nicknameText.getText().trim();
+//            if (ip.isEmpty() || port.isEmpty() || nickname.replaceAll("\\d", "").length() < 2) {
+//                JOptionPane.showMessageDialog(frame, "Invalid inputs.");
+////                System.out.println("in if");
+//                ChatClientGUI.this.clearInputs();
+//                return;
+//            }
+//            try {
+//                proxy = new ConnectionProxy(ip, Integer.parseInt(port),nickname);
+//                proxy.addConsumer(ChatClientGUI.this);
+//                ChatClientGUI.this.addConsumer(proxy);
+//                proxy.start();
+//                proxy.consume(nicknameText.getText());
+//                System.out.println("done");
+//                //state
+//                ChatClientGUI.this.stateConnected();
+//
+//
+//            } catch (ChatException exc) {
+//                System.out.println("in catch");
+//                JOptionPane.showMessageDialog(frame, "There was an error in establishment a connection");
+//                ChatClientGUI.this.clearInputs();
+//            }
+//
+//        }
+//
+//    }
+//
+//
+//    //implements dp observer
+//    class ButtonsObserver implements ActionListener {
+//        private ChatClientGUI gui;
+//
+//        public ButtonsObserver(ChatClientGUI gui) {
+//            this.gui = gui;
+//        }
+//
+//        @Override
+//        public void actionPerformed(ActionEvent e) {
+//            try {
+//                System.out.println("inside actionPerformed... thread=" + Thread.currentThread().getName() + " tf.getText()=" + messageText.getText());
+//                String text = messageText.getText();
+//                if (text.trim().length() < 1) return;
+//                String sendsTo = (String)comboBox.getSelectedItem();
+//                if(!Objects.equals(sendsTo, "Sends to everyone")){
+//                    text=Constants.privateMessage +"FROM#"+ChatClientGUI.this.nicknameText.getText()+"&TO%"+sendsTo+"@"+text;
+//                }
+//                consumer.consume(text);
+//                messageText.setText("");
+//                System.out.println(messageText.getText() + " was sent to the server by calling the consumer.consume() method thread=" + Thread.currentThread().getName());
+//            } catch (ChatException ex) {
+//                ex.printStackTrace();
+//            }
+//        }
+//    }
 
-    class connectingButton implements ActionListener {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            String ip = ipText.getText();
-            String port = portText.getText().replaceAll("[^0-9]", "");
-            String nickname = nicknameText.getText().trim();
-            if (ip.isEmpty() || port.isEmpty() || nickname.replaceAll("\\d", "").length() < 2) {
-                JOptionPane.showMessageDialog(frame, "Invalid inputs.");
-//                System.out.println("in if");
-                ChatClientGUI.this.clearInputs();
-                return;
-            }
-            try {
-                proxy = new ConnectionProxy(ip, Integer.parseInt(port),nickname);
-                proxy.addConsumer(ChatClientGUI.this);
-                ChatClientGUI.this.addConsumer(proxy);
-                proxy.start();
-                proxy.consume(nicknameText.getText());
-                System.out.println("done");
-                //state
-                ChatClientGUI.this.stateConnected();
 
-
-            } catch (ChatException exc) {
-                System.out.println("in catch");
-                JOptionPane.showMessageDialog(frame, "There was an error in establishment a connection");
-                ChatClientGUI.this.clearInputs();
-            }
-
-        }
-
-    }
-
-
-    //implements dp observer
-    class ButtonsObserver implements ActionListener {
+//    change current buttons classes to this one.
+    class ButtonListener implements ActionListener {
         private ChatClientGUI gui;
 
-        public ButtonsObserver(ChatClientGUI gui) {
+        public ButtonListener(ChatClientGUI gui) {
             this.gui = gui;
         }
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            try {
-                System.out.println("inside actionPerformed... thread=" + Thread.currentThread().getName() + " tf.getText()=" + messageText.getText());
-                String text = messageText.getText();
-                if (text.trim().length() < 1) return;
-                String sendsTo = (String)comboBox.getSelectedItem();
-                if(!Objects.equals(sendsTo, "Sends to everyone")){
-                    text=Constants.privateMessage +"FROM#"+ChatClientGUI.this.nicknameText.getText()+"&TO%"+sendsTo+"@"+text;
+            if (e.getSource() == gui.btSend) {
+                try {
+                    System.out.println("inside actionPerformed... thread=" + Thread.currentThread().getName() + " tf.getText()=" + gui.messageText.getText());
+                    String text = gui.messageText.getText();
+                    if (text.trim().length() < 1) return;
+                    String sendsTo = (String)gui.comboBox.getSelectedItem();
+                    if(!Objects.equals(sendsTo, "Sends to everyone")){
+                        text=Constants.privateMessage +"FROM#"+ChatClientGUI.this.nicknameText.getText()+"&TO%"+sendsTo+"@"+text;
+                    }
+                    gui.consumer.consume(text);
+                    gui.messageText.setText("");
+                    System.out.println(gui.messageText.getText() + " was sent to the server by calling the consumer.consume() method thread=" + Thread.currentThread().getName());
+                } catch (ChatException ex) {
+                    ex.printStackTrace();
                 }
-                consumer.consume(text);
-                messageText.setText("");
-                System.out.println(messageText.getText() + " was sent to the server by calling the consumer.consume() method thread=" + Thread.currentThread().getName());
-            } catch (ChatException ex) {
-                ex.printStackTrace();
+            } else if (e.getSource() == gui.btConnect) {
+                String ip = gui.ipText.getText();
+                String port = gui.portText.getText().replaceAll("[^0-9]", "");
+                String nickname = gui.nicknameText.getText().trim();
+                if (ip.isEmpty() || port.isEmpty() || nickname.replaceAll("\\d", "").length() < 2) {
+                    JOptionPane.showMessageDialog(gui.frame, "Invalid inputs.");
+                    // System.out.println("in if");
+                    ChatClientGUI.this.clearInputs();
+                    return;
+                }
+                try {
+                    proxy = new ConnectionProxy(ip, Integer.parseInt(port),nickname);
+                    proxy.addConsumer(gui);
+                    gui.addConsumer(proxy);
+                    proxy.start();
+                    proxy.consume(nicknameText.getText());
+                    System.out.println("done");
+                    //state
+                    ChatClientGUI.this.stateConnected();
+
+
+                } catch (ChatException exc) {
+                    System.out.println("in catch");
+                    JOptionPane.showMessageDialog(gui.frame, "There was an error in establishment a connection");
+                    ChatClientGUI.this.clearInputs();
+                }
+            } else if (e.getSource() == gui.btDisconnect) {
+                try {
+// this.state(new ConnectedState());
+                    if (proxy != null) {
+                        ChatClientGUI.this.consumer.consume(Constants.deleteUser + nicknameText.getText());
+                        proxy = null;
+                        comboBox.removeAllItems();
+                        comboBox.addItem("Sends to everyone");
+                    }
+                    btDisconnect.setEnabled(false);
+                    clearInputs();
+// btConnect.setForeground(Color.RED);
+                    btConnect.setText("Connect");
+                    ipText.setBackground(Color.white);
+                    portText.setBackground(Color.white);
+                    nicknameText.setBackground(Color.white);
+                    btConnect.setEnabled(true);
+                    btSend.setEnabled(false);
+                    messageText.setText("");
+                    textArea.setText("");
+                } catch (ChatException ex) {
+                    JOptionPane.showMessageDialog(gui.frame, "Could not disconnect, Please try again.");
+                }
             }
         }
     }
+
 }
 
