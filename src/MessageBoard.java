@@ -42,94 +42,178 @@ public class MessageBoard implements StringConsumer, StringProducer {
 
 
 
-    @Override
-    public void consume(String str) throws ChatException{
+    public void consume(String str) throws ChatException {
 
-        //new user connected
-        if(str.startsWith(Constants.createUser)) {
-            List<String> nicknames= new ArrayList<>();
+        // new user connected
+        if (str.startsWith(Constants.createUser)) {
+            List<String> nicknames = new ArrayList<>();
             String userNickname = str.substring((str.lastIndexOf("@") + 1));
-            ConnectionProxy proxy=null;
-            for (StringConsumer sc : consumers) {
+            ConnectionProxy proxy = null;
+
+            Iterator<StringConsumer> iterator = consumers.iterator();
+            while (iterator.hasNext()) {
+                StringConsumer sc = iterator.next();
                 ConnectionProxy sc1 = (ConnectionProxy) sc;
-//                System.out.println(sc1.getNickname() + userNickname);
                 if (sc1.getNickname().equals(userNickname)) {
-                    proxy=sc1;
+                    proxy = sc1;
                 } else {
                     nicknames.add(sc1.getNickname());
-//                    System.out.println("Else statement");
-                    //sends for rest users the user name to update the combo box
                     sc.consume(Constants.updateComboBox + userNickname);
                 }
             }
-            //send for the new user the updated users list
-            if(proxy!=null){
+
+            if (proxy != null) {
                 proxy.consume(Constants.createComboBox + String.join("#", nicknames).trim());
             }
         }
-//            Iterator mapIterator = map.entrySet().iterator();
-//            while (mapIterator.hasNext()) {
-//                Map.Entry mapElement = (Map.Entry)mapIterator.next();
-//               StringConsumer current= (StringConsumer) mapElement.getValue();
-//               current.consume(Constants.updateComboBox+userNickname);
-//                if(!mapIterator.hasNext())
-//            }
-//            for(int i=0;i<consumers.size()-1;i++) {
-//                    consumers.get(i).consume(Constants.updateComboBox+userNickname);
-//            }
-//            String namesAsString=String.join("#", map.keySet()).trim();
-//            consumers.get(consumers.size()-1).consume(Constants.createComboBox+namesAsString);
-//            map.put(userNickname,consumers.get(consumers.size()-1));
-//        }
 
-        //proxy.stop();
-       else if(str.startsWith(Constants.deleteUser)){
+        else if (str.startsWith(Constants.deleteUser)) {
             String deleteNickname = str.substring((str.lastIndexOf("@") + 1));
-            StringConsumer consumerToRemove=null;
-            for(StringConsumer sc:consumers){
+            StringConsumer consumerToRemove = null;
+
+            Iterator<StringConsumer> iterator = consumers.iterator();
+            while (iterator.hasNext()) {
+                StringConsumer sc = iterator.next();
                 ConnectionProxy proxy = (ConnectionProxy) sc;
-                if(proxy.getNickname().equals(deleteNickname)){
-                    consumerToRemove=proxy;
-                }
-                else{
+                if (proxy.getNickname().equals(deleteNickname)) {
+                    consumerToRemove = proxy;
+                } else {
                     sc.consume(str);
                 }
             }
+
             removeConsumer(consumerToRemove);
-            ((ConnectionProxy)consumerToRemove).stop();
+            ((ConnectionProxy) consumerToRemove).stop();
         }
-        else if(str.startsWith(Constants.privateMessage)){
+
+        else if (str.startsWith(Constants.privateMessage)) {
             System.out.println("INSIDE PRIVATE");
-            String nicknameDestination=str.substring(str.indexOf("%")+1,str.lastIndexOf("@"));
-            System.out.println("PRIVATE MESSAGE TO "+nicknameDestination);
-            String nicknameSender=str.substring(str.indexOf("#")+1,str.indexOf("&"));
-            System.out.println("@@@@@PRIVATE MESSAGE FROM "+nicknameSender);
-            ConnectionProxy proxyDest=null,proxySender=null;
-            for(StringConsumer sc:consumers){
-                ConnectionProxy proxy=(ConnectionProxy)sc;
-                if(((ConnectionProxy) sc).getNickname().equals(nicknameDestination)){
-                    proxyDest=proxy;
+            String nicknameDestination = str.substring(str.indexOf("%") + 1, str.lastIndexOf("@"));
+            System.out.println("PRIVATE MESSAGE TO " + nicknameDestination);
+            String nicknameSender = str.substring(str.indexOf("#") + 1, str.indexOf("&"));
+            System.out.println("@@@@@PRIVATE MESSAGE FROM " + nicknameSender);
+            ConnectionProxy proxyDest = null, proxySender = null;
+
+            Iterator<StringConsumer> iterator = consumers.iterator();
+            while (iterator.hasNext()) {
+                StringConsumer sc = iterator.next();
+                ConnectionProxy proxy = (ConnectionProxy) sc;
+                if (proxy.getNickname().equals(nicknameDestination)) {
+                    proxyDest = proxy;
                 }
-                if(((ConnectionProxy) sc).getNickname().equals(nicknameSender)){
-                    proxySender=proxy;
+                if (proxy.getNickname().equals(nicknameSender)) {
+                    proxySender = proxy;
                 }
             }
-            if(proxyDest!=null){
+
+            if (proxyDest != null) {
                 System.out.println("PROXY DEST IS NOT NULL");
                 proxyDest.consume(str);
             }
-            if(proxySender!=null){
+            if (proxySender != null) {
                 System.out.println("PROXY SENDER IS NOT NULL");
                 proxySender.consume(str);
             }
         }
-        else{
-            for (StringConsumer consumer : consumers) {
-            consumer.consume(str);
-        }
+
+        else {
+            Iterator<StringConsumer> iterator = consumers.iterator();
+            while (iterator.hasNext()) {
+                StringConsumer consumer = iterator.next();
+                consumer.consume(str);
+            }
         }
 
     }
+//
+//    @Override
+//    public void consume4(String str) throws ChatException{
+//
+//        //new user connected
+//        if(str.startsWith(Constants.createUser)) {
+//            List<String> nicknames= new ArrayList<>();
+//            String userNickname = str.substring((str.lastIndexOf("@") + 1));
+//            ConnectionProxy proxy=null;
+//            for (StringConsumer sc : consumers) {
+//                ConnectionProxy sc1 = (ConnectionProxy) sc;
+////                System.out.println(sc1.getNickname() + userNickname);
+//                if (sc1.getNickname().equals(userNickname)) {
+//                    proxy=sc1;
+//                } else {
+//                    nicknames.add(sc1.getNickname());
+////                    System.out.println("Else statement");
+//                    //sends for rest users the user name to update the combo box
+//                    sc.consume(Constants.updateComboBox + userNickname);
+//                }
+//            }
+//            //send for the new user the updated users list
+//            if(proxy!=null){
+//                proxy.consume(Constants.createComboBox + String.join("#", nicknames).trim());
+//            }
+//        }
+////            Iterator mapIterator = map.entrySet().iterator();
+////            while (mapIterator.hasNext()) {
+////                Map.Entry mapElement = (Map.Entry)mapIterator.next();
+////               StringConsumer current= (StringConsumer) mapElement.getValue();
+////               current.consume(Constants.updateComboBox+userNickname);
+////                if(!mapIterator.hasNext())
+////            }
+////            for(int i=0;i<consumers.size()-1;i++) {
+////                    consumers.get(i).consume(Constants.updateComboBox+userNickname);
+////            }
+////            String namesAsString=String.join("#", map.keySet()).trim();
+////            consumers.get(consumers.size()-1).consume(Constants.createComboBox+namesAsString);
+////            map.put(userNickname,consumers.get(consumers.size()-1));
+////        }
+//
+//        //proxy.stop();
+//       else if(str.startsWith(Constants.deleteUser)){
+//            String deleteNickname = str.substring((str.lastIndexOf("@") + 1));
+//            StringConsumer consumerToRemove=null;
+//            for(StringConsumer sc:consumers){
+//                ConnectionProxy proxy = (ConnectionProxy) sc;
+//                if(proxy.getNickname().equals(deleteNickname)){
+//                    consumerToRemove=proxy;
+//                }
+//                else{
+//                    sc.consume(str);
+//                }
+//            }
+//            removeConsumer(consumerToRemove);
+//            ((ConnectionProxy)consumerToRemove).stop();
+//        }
+//        else if(str.startsWith(Constants.privateMessage)){
+//            System.out.println("INSIDE PRIVATE");
+//            String nicknameDestination=str.substring(str.indexOf("%")+1,str.lastIndexOf("@"));
+//            System.out.println("PRIVATE MESSAGE TO "+nicknameDestination);
+//            String nicknameSender=str.substring(str.indexOf("#")+1,str.indexOf("&"));
+//            System.out.println("@@@@@PRIVATE MESSAGE FROM "+nicknameSender);
+//            ConnectionProxy proxyDest=null,proxySender=null;
+//            for(StringConsumer sc:consumers){
+//                ConnectionProxy proxy=(ConnectionProxy)sc;
+//                if(((ConnectionProxy) sc).getNickname().equals(nicknameDestination)){
+//                    proxyDest=proxy;
+//                }
+//                if(((ConnectionProxy) sc).getNickname().equals(nicknameSender)){
+//                    proxySender=proxy;
+//                }
+//            }
+//            if(proxyDest!=null){
+//                System.out.println("PROXY DEST IS NOT NULL");
+//                proxyDest.consume(str);
+//            }
+//            if(proxySender!=null){
+//                System.out.println("PROXY SENDER IS NOT NULL");
+//                proxySender.consume(str);
+//            }
+//        }
+//        else{
+//            for (StringConsumer consumer : consumers) {
+//            consumer.consume(str);
+//        }
+//        }
+//
+//    }
 
 
 //    @Override
